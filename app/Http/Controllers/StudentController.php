@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+
 use App\Models\Student;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class StudentController extends Controller
 {
@@ -26,20 +28,34 @@ class StudentController extends Controller
             'nim' => 'required|unique:students,nim',
             'nama' => 'required',
             'email' => 'required|email',
-            'prodi' => 'required'
+            'prodi' => 'required',
+            'foto' => 'required'
         ], [
                 'nim.required' => 'NIM harus diisi.',
                 'nim.unique' => 'NIM sudah digunakan.',
                 'nama.required' => 'Nama harus diisi.',
                 'email.required' => 'Email harus diisi.',
                 'email.email' => 'Format email tidak valid.',
-                'prodi.required' => 'Program studi harus diisi.'
+                'prodi.required' => 'Program studi harus diisi.',
+
+                'foto.required' => 'Foto harus diupload.'
             ]);
-        $students = new Student();
+
+        if ($request->hasFile('foto')) {
+            $foto = $request->file('foto')->store('public/foto');
+            $foto = basename($foto);
+        } else {
+            $foto = null;
+        }
+
+        $students = new Student($validatedData);
         $students->nim = $request->nim;
         $students->nama = $request->nama;
         $students->email = $request->email;
         $students->prodi = $request->prodi;
+
+        $students->foto = $foto ? 'foto/' .$foto : null ;
+
         if ($students->save()) {
             return redirect('/student')->with([
                 'notifikasi' => 'Data Berhasil disimpan !',

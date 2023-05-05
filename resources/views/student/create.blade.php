@@ -19,7 +19,7 @@
                     Tambah Siswa
                     <a href="/student" type="button" class="btn btn-danger floatright">Kembali</a>
                 </div>
-                <form action="/student/add" method="POST">
+                <form action="/student/add" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="card-body">
                         @if (session('notifikasi'))
@@ -51,6 +51,14 @@
                             <input required placeholder="Masukkan E-Mail" type="email" id="email" name="email"
                                 class="form-control @error('email') isinvalid @enderror" value="{{ old('email') }}">
                             @error('email')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="form-group">
+                            <label for="nama">Foto <b class="textdanger">*</b></label>
+                            <input required placeholder="Upload Foto" type="file" accept="image/png, image/jpg, image/jpeg" id="foto" name="foto"
+                                class="form-control @error('foto') isinvalid @enderror" value="{{ old('foto') }}">
+                            @error('foto')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>

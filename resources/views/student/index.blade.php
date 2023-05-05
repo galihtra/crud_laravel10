@@ -31,6 +31,7 @@
                                 <td>NIM</td>
                                 <td>Nama</td>
                                 <td>Prodi</td>
+                                <td>Foto</td>
                                 <td>aksi</td>
                             </thead>
                             <tbody>
@@ -40,6 +41,7 @@
                                         <td>{{ $data->nim }}</td>
                                         <td>{{ $data->nama }}</td>
                                         <td>{{ $data->prodi }}</td>
+                                        <td> <img class="img-fluid"  src="{{ asset('storage/' .$data->foto )}}"></td>
                                         <td class="d-flex justify-content-lg-start">
                                             <a href="/student/edit/{{ $data->nim }}" class="btn btn-sm btn-warning mx-2">Edit</a>
                                             <form method="POST" action="/student/delete/{{ $data->nim }}">
