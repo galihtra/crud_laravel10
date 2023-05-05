@@ -5,9 +5,99 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Students Edit | Laravel</title>
+    <title>Edit Siswa | Laravel</title>
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <!-- Custom CSS -->
+    <style>
+        /* CSS styling for the page */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f8f8;
+        }
+
+        .container {
+            margin-top: 20px;
+        }
+
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            background-color: #007bff;
+            color: #fff;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 10px 10px 0px 0px;
+            padding: 15px;
+        }
+
+        .card-header h5 {
+            margin-bottom: 0;
+        }
+
+        .card-header button {
+            margin-left: auto;
+        }
+
+        .card-body {
+            padding: 0;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-control {
+            border-radius: 10px;
+        }
+
+        .btn {
+            margin: 5px;
+            border-radius: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: white;
+        }
+
+        /* Warna button Kembali */
+        .btn-kembali {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+
+        /* Warna button Simpan */
+        .btn-simpan {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+
+        /* Warna button Reset */
+        .btn-reset {
+            background-color: #ffc107;
+            border-color: #ffc107;
+        }
+
+        /* Warna form-control yang tidak valid */
+        .form-control.is-invalid {
+            border-color: #dc3545;
+        }
+
+        /* Pesan error */
+        .invalid-feedback {
+            display: block;
+            margin-top: 5px;
+            color: #dc3545;
+        }
+    </style>
+
 </head>
 
 <body>
@@ -16,22 +106,15 @@
             <div class="card">
                 <div class="card-header">
                     Edit Siswa
-                    <a href="/student" type="button" class="btn btn-danger float-right">Kembali</a>
+                    <a href="/student" type="button" class="btn btn-kembali float-right">Kembali</a>
                 </div>
-                <form action="/student/edit/{{ $student->nim }}" method="POST">
+                <form action="/student/edit/{{ $student->nim }}" method="POST" class="m-3" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
                     <input name="old_nim" hidden value="{{ $student->nim }}" />
                     <div class="card-body">
-                        @if (session('notifikasi'))
-                            <div class="form-group">
-                                <div class="alert alert-{{ session('type') }}">
-                                    {{ session('notifikasi') }}
-                                </div>
-                            </div>
-                        @endif
                         <div class="form-group">
-                            <label for="nama">NIM <b class="text-danger">*</b></label>
+                            <label for="nim">NIM <b class="text-danger">*</b></label>
                             <input required placeholder="Masukkan NIM" type="text" id="nim" name="nim"
                                 class="form-control @error('nim') is-invalid @enderror"
                                 value="{{ old('nim', $student->nim) }}">
@@ -49,7 +132,7 @@
                             @enderror
                         </div>
                         <div class="form-group">
-                            <label for="nama">E-Mail <b class="text-danger">*</b></label>
+                            <label for="email">E-Mail <b class="text-danger">*</b></label>
                             <input required placeholder="Masukkan E-Mail" type="email" id="email" name="email"
                                 class="form-control @error('email') is-invalid @enderror"
                                 value="{{ old('email', $student->email) }}">
@@ -57,17 +140,52 @@
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
+                        
+                        <!-- Tambahkan label dan elemen input untuk Foto Lama -->
                         <div class="form-group">
-                            <label for="nama">Prodi <b class="text-danger">*</b></label>
-                            <select required id="prodi" name="prodi"
+                            <label for="foto_lama">Foto Lama</label>
+                            @if ($student->foto)
+                                <div><img class="img-fluid"
+                                        src="{{ asset('storage/' . $student->foto) }}" width="200">
+                                </div>
+                            @else
+                                <p>Tidak ada foto</p>
+                            @endif
+                        </div>
+
+                        <!-- Tambahkan checkbox untuk menambahkan foto baru -->
+                        <div class="form-group">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" id="addFotoBaruCheck">
+                                <label class="form-check-label" for="addFotoBaruCheck">
+                                    Tambahkan Foto Baru
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Tambahkan label dan elemen input untuk Foto Baru -->
+                        <div class="form-group" id="fotoBaruGroup" style="display: none;">
+                            <label for="foto_baru">Foto Baru</label>
+                            <input type="file" id="foto_baru" name="foto_baru"
+                                class="form-control @error('foto_baru') is-invalid @enderror">
+                            @error('foto_baru')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="form-group">
+                            <label for="prodi">Prodi <b class="text-danger">*</b></label>
+                            <select id="prodi" name="prodi"
                                 class="form-control @error('prodi') is-invalid @enderror" required>
                                 <option value="">- Pilih Prodi -</option>
-                                <option @if (old('prodi', $student->prodi) == 'Teknik Informatika') {{ 'selected' }} @endif>Teknik Informatika
+                                <option @if (old('prodi', $student->prodi) == 'Teknik Informatika') {{ 'selected' }} @endif>
+                                    Teknik Informatika
                                 </option>
-                                <option @if (old('prodi', $student->prodi) == 'Teknik Rekayasa Keamanan Siber') {{ 'selected' }} @endif>Teknik Rekayasa
-                                    Keamanan Siber</option>
-                                <option @if (old('prodi', $student->prodi) == 'Teknik Rekayasa Perangkat Lunak') {{ 'selected' }} @endif>Teknik Rekayasa
-                                    Perangkat Lunak</option>
+                                <option @if (old('prodi', $student->prodi) == 'Teknik Rekayasa Keamanan Siber') {{ 'selected' }} @endif>
+                                    Teknik Rekayasa Keamanan Siber
+                                </option>
+                                <option @if (old('prodi', $student->prodi) == 'Teknik Rekayasa Perangkat Lunak') {{ 'selected' }} @endif>
+                                    Teknik Rekayasa Perangkat Lunak
+                                </option>
                             </select>
                             @error('prodi')
                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -75,25 +193,31 @@
                         </div>
                     </div>
                     <div class="card-footer">
-                        <a href="/student" class="btn btn-danger">Batal</a>
-                        <button type="reset" class="btn btn-warning">Reset</button>
-                        <button type="submit" class="btn btn-success">Edit</button>
+                        <a href="/student" class="btn btn-kembali">Batal</a>
+                        <button type="reset" class="btn btn-reset">Reset</button>
+                        <button type="submit" class="btn btn-simpan">Simpan</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous">
+    <!-- (scripts) -->
+    <script>
+        
+        document.getElementById('addFotoBaruCheck').addEventListener('change', function () {
+            const fotoBaruGroup = document.getElementById('fotoBaruGroup');
+            if (this.checked) {
+                fotoBaruGroup.style.display = 'block';
+            } else {
+                fotoBaruGroup.style.display = 'none';
+            }
+        });
     </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
-        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous">
-    </script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
-    </script>
-
+    <!-- Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha384-XXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"
+        integrity="sha384-XXXXXXXXXXXXXXXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
 </body>
 
 </html>
